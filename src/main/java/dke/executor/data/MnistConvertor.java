@@ -1,12 +1,35 @@
-package dke.executor.data.mnist;
+package dke.executor.data;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dke.executor.data.mnist.InputMnist;
+import dke.executor.data.mnist.OutputMnist;
+import dke.executor.data.mnist.ResultMnist;
 
 import java.io.IOException;
 
 public class MnistConvertor {
-    public float[][] getResultValue(String result, long inputTime, int number) {
+    public String getOutputData(float[][] resultValue, int number, Long inputTime, Long outputTime) {
+        String outputData = null;
+
+        OutputMnist outputMnist = new OutputMnist();
+        outputMnist.setResult(resultValue);
+        outputMnist.setNumber(number);
+        outputMnist.setInputTime(inputTime);
+        outputMnist.setOutputTime(outputTime);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            outputData = objectMapper.writeValueAsString(outputMnist);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return outputData;
+    }
+
+    public float[][] getResultValue(String result) {
         float[][] resultValue = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -18,15 +41,15 @@ public class MnistConvertor {
         return resultValue;
     }
 
-    public String getPostData(String data) {
+    public String getPostData(float[][][][] data) {
         String postData = null;
 
-        InputMnist instanceMnist = new InputMnist();
-        instanceMnist.setInstances(stringToArray(data));
+        InputMnist inputMnist = new InputMnist();
+        inputMnist.setInstances(data);
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            postData = objectMapper.writeValueAsString(instanceMnist);
+            postData = objectMapper.writeValueAsString(inputMnist);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

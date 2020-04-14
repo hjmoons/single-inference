@@ -1,10 +1,11 @@
 package dke.executor.model;
 
-import dke.executor.data.mnist.MnistConvertor;
+import dke.executor.data.MnistConvertor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.json.JSONObject;
 
 import java.time.Duration;
@@ -45,11 +46,18 @@ public class DataPipeline {
                 String input = record.value();
 
                 JSONObject inputJSON = new JSONObject(input);
-                String data = inputJSON.getString("data");
+                String stringData = inputJSON.getString("data");
                 long inputTime = inputJSON.getLong("time");
                 int number = inputJSON.getInt("number");
 
+                float[][][][] data = mnistConvertor.stringToArray(stringData);
                 String result = modelLoad.postData(mnistConvertor.getPostData(data));
+
+                float[][] resultValue = mnistConvertor.getResultValue(result);
+                long outputTime = System.currentTimeMillis();
+                String outputData = mnistConvertor.getOutputData(resultValue, number, inputTime, outputTime);
+
+                kafkaProducer.send(new ProducerRecord<String, String>(outputTopic, outputData));
             }
         }
     }
