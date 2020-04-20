@@ -1,27 +1,24 @@
-package dke.executor.model;
+package dke.executor.main.model;
 
-import dke.executor.data.MnistConvertor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.json.JSONObject;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 
-public class DataPipeline {
+public class APIExecutor {
     private String inputTopic;
     private String outputTopic;
     private KafkaConsumer<String, String> kafkaConsumer;
     private KafkaProducer<String, String> kafkaProducer;
-    private ModelRequest modelLoad;
-    private MnistConvertor mnistConvertor;
+    private ModelRequest modelRequest;
 
-    public DataPipeline(String bootstrap, String inputTopic, String outputTopic){
+    public APIExecutor(String bootstrap, String inputTopic, String outputTopic){
         this.inputTopic = inputTopic;
         this.outputTopic = outputTopic;
 
@@ -29,11 +26,10 @@ public class DataPipeline {
         Properties producerProp = setProducerConfig(bootstrap);
         kafkaConsumer = new KafkaConsumer<String, String>(consumerProp);
         kafkaProducer = new KafkaProducer<String, String>(producerProp);
-        mnistConvertor = new MnistConvertor();
     }
 
-    public DataPipeline InputConsumer(String servingUrl) {
-        this.modelLoad = new ModelRequest(servingUrl);
+    public APIExecutor InputConsumer(String servingUrl) {
+        this.modelRequest = new dke.executor.main.model.ModelRequest(servingUrl);
         return this;
     }
 
@@ -43,21 +39,9 @@ public class DataPipeline {
         while (true){
             ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(1000));
             for(ConsumerRecord<String, String> record : records){
-                String input = record.value();
-
-                JSONObject inputJSON = new JSONObject(input);
-                String stringData = inputJSON.getString("data");
-                long inputTime = inputJSON.getLong("time");
-                int number = inputJSON.getInt("number");
-
-                float[][][][] data = mnistConvertor.stringToArray(stringData);
-                String result = modelLoad.postData(mnistConvertor.getPostData(data));
-
-                float[][] resultValue = mnistConvertor.getResultValue(result);
-                long outputTime = System.currentTimeMillis();
-                String outputData = mnistConvertor.getOutputData(resultValue, number, inputTime, outputTime);
-
-                kafkaProducer.send(new ProducerRecord<String, String>(outputTopic, outputData));
+                String instJson = record.value();
+                String predJson = modelRequest.postData(instJson);
+                kafkaProducer.send(new ProducerRecord<String, String>(outputTopic, predJson));
             }
         }
     }

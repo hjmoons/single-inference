@@ -1,6 +1,6 @@
-package dke.executor;
+package dke.executor.main;
 
-import dke.executor.model.DataPipeline;
+import dke.executor.main.model.APIExecutor;
 
 public class ModelExecutorMain {
     public static void main(String[] args) {
@@ -9,7 +9,7 @@ public class ModelExecutorMain {
         String outputTopic = args[1];
         String servingAPI = args[2];
 
-        DataPipeline inputConsumer = new DataPipeline(bootstrap, inputTopic, outputTopic).InputConsumer(servingAPI);
+        APIExecutor inputConsumer = new APIExecutor(bootstrap, inputTopic, outputTopic).InputConsumer(servingAPI);
         inputConsumer.consume();
     }
 }
