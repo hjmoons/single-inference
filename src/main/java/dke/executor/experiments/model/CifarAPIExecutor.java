@@ -46,7 +46,7 @@ public class CifarAPIExecutor {
         objectMapper = new ObjectMapper();
     }
 
-    public CifarAPIExecutor InputConsumer(String servingUrl) {
+    public CifarAPIExecutor load(String servingUrl) {
         this.modelRequest = new ModelRequest(servingUrl);
         return this;
     }

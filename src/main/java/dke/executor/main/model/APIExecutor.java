@@ -28,8 +28,8 @@ public class APIExecutor {
         kafkaProducer = new KafkaProducer<String, String>(producerProp);
     }
 
-    public APIExecutor InputConsumer(String servingUrl) {
-        this.modelRequest = new dke.executor.main.model.ModelRequest(servingUrl);
+    public APIExecutor load(String servingUrl) {
+        this.modelRequest = new ModelRequest(servingUrl);
         return this;
     }
 

@@ -1,6 +1,7 @@
 package dke.executor.experiments;
 
-import dke.executor.main.model.APIExecutor;
+import dke.executor.experiments.model.CifarAPIExecutor;
+import dke.executor.experiments.model.MnistAPIExecutor;
 
 public class ModelExecutorTest {
     public static void main(String[] args) {
@@ -8,8 +9,18 @@ public class ModelExecutorTest {
         String inputTopic = args[0];
         String outputTopic = args[1];
         String servingAPI = args[2];
+        String modelName = args[3];
 
-        APIExecutor inputConsumer = new APIExecutor(bootstrap, inputTopic, outputTopic).InputConsumer(servingAPI);
-        inputConsumer.consume();
+        if(modelName.equals("mnist")) {
+            System.out.println("MNIST model start!!");
+            MnistAPIExecutor mnistAPIExecutor = new MnistAPIExecutor(bootstrap, inputTopic, outputTopic).load(servingAPI);
+            mnistAPIExecutor.consume();
+        } else if(modelName.equals("cifar10")) {
+            System.out.println("CIFAR-10 model start!!");
+            CifarAPIExecutor cifarAPIExecutor = new CifarAPIExecutor(bootstrap, inputTopic, outputTopic).load(servingAPI);
+            cifarAPIExecutor.consume();
+        } else {
+            System.out.println("Wrong data name is inserted!!");
+        }
     }
 }

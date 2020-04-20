@@ -42,7 +42,7 @@ public class MnistAPIExecutor {
         objectMapper = new ObjectMapper();
     }
 
-    public MnistAPIExecutor InputConsumer(String servingUrl) {
+    public MnistAPIExecutor load(String servingUrl) {
         this.modelRequest = new ModelRequest(servingUrl);
         return this;
     }

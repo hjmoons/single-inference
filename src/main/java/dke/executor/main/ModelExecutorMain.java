@@ -9,7 +9,7 @@ public class ModelExecutorMain {
         String outputTopic = args[1];
         String servingAPI = args[2];
 
-        APIExecutor inputConsumer = new APIExecutor(bootstrap, inputTopic, outputTopic).InputConsumer(servingAPI);
+        APIExecutor inputConsumer = new APIExecutor(bootstrap, inputTopic, outputTopic).load(servingAPI);
         inputConsumer.consume();
     }
 }
