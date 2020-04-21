@@ -59,13 +59,13 @@ public class CifarAPIExecutor {
             for(ConsumerRecord<String, String> record : records){
                 // 스톰 기반 분산 딥러닝 추론 모델 비교 실험 용도
                 String inputJson = record.value();
-                String outputJson = mnistModel(inputJson);
+                String outputJson = cifarModel(inputJson);
                 kafkaProducer.send(new ProducerRecord<String, String>(outputTopic, outputJson));
             }
         }
     }
 
-    public String mnistModel(String inputJson) {
+    public String cifarModel(String inputJson) {
         String outputJson = null;
 
         try {
