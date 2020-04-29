@@ -1,24 +1,37 @@
-package dke.executor.main.model;
+package dke.executor.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dke.executor.data.mnist.InputMnist;
+import dke.executor.data.mnist.InstancesMnist;
+import dke.executor.data.mnist.OutputMnist;
+import dke.executor.data.mnist.PredictionsMnist;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 
-public class APIExecutor {
+public class MnistAPIExecutor {
     private String inputTopic;
     private String outputTopic;
     private KafkaConsumer<String, String> kafkaConsumer;
     private KafkaProducer<String, String> kafkaProducer;
     private ModelRequest modelRequest;
+    private ObjectMapper objectMapper;
 
-    public APIExecutor(String bootstrap, String inputTopic, String outputTopic){
+    private InputMnist inputMnist;
+    private PredictionsMnist predictionsMnist;
+
+    private OutputMnist outputMnist = new OutputMnist();
+    private InstancesMnist instancesMnist = new InstancesMnist();
+
+    public MnistAPIExecutor(String bootstrap, String inputTopic, String outputTopic){
         this.inputTopic = inputTopic;
         this.outputTopic = outputTopic;
 
@@ -26,9 +39,10 @@ public class APIExecutor {
         Properties producerProp = setProducerConfig(bootstrap);
         kafkaConsumer = new KafkaConsumer<String, String>(consumerProp);
         kafkaProducer = new KafkaProducer<String, String>(producerProp);
+        objectMapper = new ObjectMapper();
     }
 
-    public APIExecutor load(String servingUrl) {
+    public MnistAPIExecutor load(String servingUrl) {
         this.modelRequest = new ModelRequest(servingUrl);
         return this;
     }
@@ -39,11 +53,36 @@ public class APIExecutor {
         while (true){
             ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofSeconds(1000));
             for(ConsumerRecord<String, String> record : records){
-                String instJson = record.value();
-                String predJson = modelRequest.postData(instJson);
-                kafkaProducer.send(new ProducerRecord<String, String>(outputTopic, predJson));
+                // 스톰 기반 분산 딥러닝 추론 모델 비교 실험 용도
+                String inputJson = record.value();
+                String outputJson = mnistModel(inputJson);
+                kafkaProducer.send(new ProducerRecord<String, String>(outputTopic, outputJson));
             }
         }
+    }
+
+    public String mnistModel(String inputJson) {
+        String outputJson = null;
+
+        try {
+            inputMnist = objectMapper.readValue(inputJson, InputMnist.class);
+            instancesMnist.setInstances(inputMnist.getInstances());
+            String instancesJson = objectMapper.writeValueAsString(instancesMnist);
+            String output  = modelRequest.postData(instancesJson);
+
+            predictionsMnist = objectMapper.readValue(output, PredictionsMnist.class);
+
+            outputMnist.setPredictions(predictionsMnist.getPredictions());
+            outputMnist.setInputTime(inputMnist.getInputTime());
+            outputMnist.setOutputTime(System.currentTimeMillis());
+            outputMnist.setNumber(inputMnist.getNumber());
+
+            outputJson = objectMapper.writeValueAsString(outputMnist);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return outputJson;
     }
 
     public Properties setConsumerConfig(String bootstrap) {
@@ -67,6 +106,4 @@ public class APIExecutor {
         properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         return properties;
     }
-
-
 }

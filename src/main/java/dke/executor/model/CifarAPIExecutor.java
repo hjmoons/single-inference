@@ -1,10 +1,10 @@
-package dke.executor.experiments.model;
+package dke.executor.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dke.executor.experiments.data.mnist.InputMnist;
-import dke.executor.experiments.data.mnist.InstancesMnist;
-import dke.executor.experiments.data.mnist.OutputMnist;
-import dke.executor.experiments.data.mnist.PredictionsMnist;
+import dke.executor.data.cifar10.InputCifar;
+import dke.executor.data.cifar10.InstancesCifar;
+import dke.executor.data.cifar10.OutputCifar;
+import dke.executor.data.cifar10.PredictionsCifar;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 
-public class MnistAPIExecutor {
+public class CifarAPIExecutor {
     private String inputTopic;
     private String outputTopic;
     private KafkaConsumer<String, String> kafkaConsumer;
@@ -25,13 +25,13 @@ public class MnistAPIExecutor {
     private ModelRequest modelRequest;
     private ObjectMapper objectMapper;
 
-    private InputMnist inputMnist;
-    private PredictionsMnist predictionsMnist;
+    private InputCifar inputCifar;
+    private PredictionsCifar predictionsCifar;
 
-    private OutputMnist outputMnist = new OutputMnist();
-    private InstancesMnist instancesMnist = new InstancesMnist();
+    private OutputCifar outputCifar = new OutputCifar();
+    private InstancesCifar instancesCifar = new InstancesCifar();
 
-    public MnistAPIExecutor(String bootstrap, String inputTopic, String outputTopic){
+    public CifarAPIExecutor(String bootstrap, String inputTopic, String outputTopic){
         this.inputTopic = inputTopic;
         this.outputTopic = outputTopic;
 
@@ -42,7 +42,7 @@ public class MnistAPIExecutor {
         objectMapper = new ObjectMapper();
     }
 
-    public MnistAPIExecutor load(String servingUrl) {
+    public CifarAPIExecutor load(String servingUrl) {
         this.modelRequest = new ModelRequest(servingUrl);
         return this;
     }
@@ -55,29 +55,29 @@ public class MnistAPIExecutor {
             for(ConsumerRecord<String, String> record : records){
                 // 스톰 기반 분산 딥러닝 추론 모델 비교 실험 용도
                 String inputJson = record.value();
-                String outputJson = mnistModel(inputJson);
+                String outputJson = cifarModel(inputJson);
                 kafkaProducer.send(new ProducerRecord<String, String>(outputTopic, outputJson));
             }
         }
     }
 
-    public String mnistModel(String inputJson) {
+    public String cifarModel(String inputJson) {
         String outputJson = null;
 
         try {
-            inputMnist = objectMapper.readValue(inputJson, InputMnist.class);
-            instancesMnist.setInstances(inputMnist.getInstances());
-            String instancesJson = objectMapper.writeValueAsString(instancesMnist);
-            String output  = modelRequest.postData(instancesJson);
+            inputCifar = objectMapper.readValue(inputJson, InputCifar.class);
+            instancesCifar.setInstances(inputCifar.getInstances());
+            String instancesJson = objectMapper.writeValueAsString(instancesCifar);
+            String predictJson  = modelRequest.postData(instancesJson);
 
-            predictionsMnist = objectMapper.readValue(output, PredictionsMnist.class);
+            predictionsCifar = objectMapper.readValue(predictJson, PredictionsCifar.class);
 
-            outputMnist.setPredictions(predictionsMnist.getPredictions());
-            outputMnist.setInputTime(inputMnist.getInputTime());
-            outputMnist.setOutputTime(System.currentTimeMillis());
-            outputMnist.setNumber(inputMnist.getNumber());
+            outputCifar.setPredictions(predictionsCifar.getPredictions());
+            outputCifar.setInputTime(inputCifar.getInputTime());
+            outputCifar.setOutputTime(System.currentTimeMillis());
+            outputCifar.setNumber(inputCifar.getNumber());
 
-            outputJson = objectMapper.writeValueAsString(outputMnist);
+            outputJson = objectMapper.writeValueAsString(outputCifar);
         } catch (IOException e) {
             e.printStackTrace();
         }

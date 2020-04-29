@@ -1,6 +1,6 @@
-package dke.executor.experiments.data.mnist;
+package dke.executor.data.cifar10;
 
-public class OutputMnist {
+public class OutputCifar {
     private float[][] predictions;
     private Long inputTime;
     private Long outputTime;

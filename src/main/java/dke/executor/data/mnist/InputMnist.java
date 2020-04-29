@@ -1,4 +1,4 @@
-package dke.executor.experiments.data.mnist;
+package dke.executor.data.mnist;
 
 public class InputMnist {
     private float[][][][] instances;

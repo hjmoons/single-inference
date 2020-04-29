@@ -1,7 +1,7 @@
-package dke.executor.experiments;
+package dke.executor;
 
-import dke.executor.experiments.model.CifarAPIExecutor;
-import dke.executor.experiments.model.MnistAPIExecutor;
+import dke.executor.model.CifarAPIExecutor;
+import dke.executor.model.MnistAPIExecutor;
 
 public class ModelExecutorTest {
     public static void main(String[] args) {

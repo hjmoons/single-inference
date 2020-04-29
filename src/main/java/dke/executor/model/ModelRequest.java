@@ -1,4 +1,4 @@
-package dke.executor.main.model;
+package dke.executor.model;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;

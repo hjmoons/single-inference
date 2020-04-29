@@ -1,4 +1,4 @@
-package dke.executor.experiments.data.cifar10;
+package dke.executor.data.cifar10;
 
 public class InstancesCifar {
     private int[][][][] instances;
