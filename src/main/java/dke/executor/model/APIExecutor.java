@@ -1,4 +1,4 @@
-package dke.executor.main.model;
+package dke.executor.model;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;

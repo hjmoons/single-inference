@@ -77,7 +77,7 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>dke.executor.main.ModelExecutorMain</mainClass>
+              <mainClass>dke.executor.ModelExecutorMain</mainClass>
               <mainClass>dke.executor.experiments.ModelExecutorTest</mainClass>
             </manifest>
           </archive>

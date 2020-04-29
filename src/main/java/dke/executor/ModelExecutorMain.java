@@ -1,6 +1,6 @@
-package dke.executor.main;
+package dke.executor;
 
-import dke.executor.main.model.APIExecutor;
+import dke.executor.model.APIExecutor;
 
 public class ModelExecutorMain {
     public static void main(String[] args) {
