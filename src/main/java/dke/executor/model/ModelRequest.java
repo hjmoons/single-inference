@@ -11,6 +11,10 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * 서빙된 모델을 통해 추론을 실행하는 클래스
+ * 입력데이터를 POST 방식으로 전송하여 결과값을 얻는다.
+ */
 public class ModelRequest {
     private CloseableHttpClient httpClient;
     private HttpPost httpPost;

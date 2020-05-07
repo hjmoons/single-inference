@@ -33,6 +33,11 @@ public class APIExecutor {
         return this;
     }
 
+    /**
+     * 카프카 컨슈머를 통해 입력데이터를 받고, 이를 서빙 모델로 전송하기 위해 API를 실행한다.
+     * 데이터는 모델의 입력 형태 그대로 카프카에서 가져오기 때문에 별도의 변환을 필요가 없다.
+     * 전송에 성공하면 결과값을 카프카로 다시 전송한다.
+     */
     public void consume(){
         kafkaConsumer.subscribe(Arrays.asList(inputTopic));
 
@@ -46,6 +51,7 @@ public class APIExecutor {
         }
     }
 
+    /* Kafka Consumer Configure */
     public Properties setConsumerConfig(String bootstrap) {
         String groupId = UUID.randomUUID().toString();
 
@@ -60,6 +66,7 @@ public class APIExecutor {
         return properties;
     }
 
+    /* Kafka Producer Configure*/
     public Properties setProducerConfig(String bootstrap) {
         Properties properties = new Properties();
         properties.put("bootstrap.servers", bootstrap);
