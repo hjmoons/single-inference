@@ -41,7 +41,7 @@ public static void main(String[] args) {
 }
 ```
 bootstrap 변수에 카프카 정보를 입력하고, 프로젝트를 install 하여 jar 파일을 생성한다.
-jar파일 실행은 다음과 같다.
+jar파일 실행은 다음과 같다. 실행은 서빙 모델이 먼저 실행되어야 한다.
 ```$xslt
 $ java -jar Model-API-Executor-1.0-SNAPSHOT-jar-with-dependencies.jar <KAFKA_INPUT> <KAFKA_OUTPUT> <API_ADDRESS>
 ```
