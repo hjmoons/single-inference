@@ -26,7 +26,22 @@
 }
 ```
 
-### 실행방법
+### 실행방법   
+
+모델을 실행하기 전데 APIIOManager 클래스에서 본인의 카프카 bootstrap 정보를 입력해야한다.
+```java
+public static void main(String[] args) {
+    String bootstrap = "";
+    String inputTopic = args[0];
+    String outputTopic = args[1];
+    String servingAPI = args[2];
+
+    APIExecutor inputConsumer = new APIExecutor(bootstrap, inputTopic, outputTopic).load(servingAPI);
+    inputConsumer.consume();
+}
+```
+bootstrap 변수에 카프카 정보를 입력하고, 프로젝트를 install 하여 jar 파일을 생성한다.
+jar파일 실행은 다음과 같다.
 ```$xslt
 $ java -jar Model-API-Executor-1.0-SNAPSHOT-jar-with-dependencies.jar <KAFKA_INPUT> <KAFKA_OUTPUT> <API_ADDRESS>
 ```
