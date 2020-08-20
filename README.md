@@ -1,4 +1,4 @@
-# Model API Executor
+# Inference Manager
  
 서빙한 딥러닝 모델과 실시간 데이터를 받는 카프카 사이에 중간 통로 역할을 하는 모델 
 
